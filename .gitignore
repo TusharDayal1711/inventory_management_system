@@ -1,0 +1,15 @@
+# GoLand project settings
+.idea/
+
+# Environment variables
+.env
+
+# PostgreSQL volume data
+pgdata/
+
+# os pecific files
+.DS_Store
+Thumbs.db
+
+# Docker compose file
+docker-compose.yaml
