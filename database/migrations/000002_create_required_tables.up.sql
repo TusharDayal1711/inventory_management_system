@@ -2,10 +2,12 @@
 CREATE TABLE IF NOT EXISTS users(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL,
+    contact_no TEXT,
     system_role system_role DEFAULT NULL,
     employee_type employee_type DEFAULT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    archived_at TIMESTAMP
 );
 
 --assets table
@@ -16,6 +18,7 @@ CREATE TABLE IF NOT EXISTS assets(
     serial_no TEXT NOT NULL,
     purchase_date timestamp,
     owned_by ownership NOT NULL DEFAULT 'remotestate',
+    type asset_type,
     warranty_start TIMESTAMP,
     warranty_expire TIMESTAMP,
     added_by UUID REFERENCES users(id),

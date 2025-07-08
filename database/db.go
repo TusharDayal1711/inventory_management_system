@@ -2,20 +2,44 @@ package database
 
 import (
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 var DB *sqlx.DB
 
-func Init(connectionStr string) error {
-	fmt.Println("Connecting to:", connectionStr)
+func Init(connectionStr string) {
 	var err error
 	DB, err = sqlx.Connect("postgres", connectionStr)
 	if err != nil {
-		return fmt.Errorf("failed to connect to Postgres: %w", err)
+		log.Fatalf("Cannot connect to Postgres: %+v", err)
+	}
+	fmt.Println("Connected to PostgreSQL...")
+
+	if err := migrateUp(DB); err != nil {
+		log.Fatalf("Migration failed: %+v", err)
+	}
+}
+
+func migrateUp(db *sqlx.DB) error {
+	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	if err != nil {
+		return err
 	}
 
-	fmt.Println("Connected to PostgreSQL")
+	m, err := migrate.NewWithDatabaseInstance("file://database/migrations", "postgres", driver)
+	if err != nil {
+		return err
+	}
+
+	if err := m.Up(); err != nil && err.Error() != "no change" {
+		return err
+	}
+
+	fmt.Println("Migration complete.")
 	return nil
 }

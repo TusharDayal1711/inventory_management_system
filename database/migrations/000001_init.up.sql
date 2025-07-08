@@ -36,13 +36,7 @@ CREATE TYPE ownership AS ENUM (
 );
 
 
---for timeline
-CREATE TYPE asset_log_status AS ENUM (
-    'assigned',
-    'returned',
-    'sent_for_service',
-    'received_from_service'
-);
+
 
 --tables
 
