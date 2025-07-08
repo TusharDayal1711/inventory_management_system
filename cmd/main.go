@@ -10,13 +10,7 @@ import (
 func main() {
 	config.LoadEnv()
 	dbConnectionString := config.GetDatabaseString()
-	err := database.Init(dbConnectionString)
-	if err != nil {
-		fmt.Printf("Database connection failed: %v\n", err)
-		os.Exit(1)
-	}
+	database.Init(dbConnectionString)
 	defer database.DB.Close()
-	fmt.Println("postgres connected.")
-
 	fmt.Println("Starting server on port " + os.Getenv("SERVER_PORT"))
 }
