@@ -1,0 +1,2 @@
+ALTER TABLE users
+ADD COLUMN contact_no TEXT UNIQUE
