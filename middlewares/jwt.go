@@ -10,8 +10,8 @@ import (
 	_ "github.com/pkg/errors"
 )
 
-var jwtKey = []byte(os.Getenv("SECRET_KEY"))
-var refreshTokenKey = []byte(os.Getenv("REFRESH_TOKEN"))
+var jwtSecretKey = []byte(os.Getenv("SECRET_KEY"))
+var refreshTokenSecretKey = []byte(os.Getenv("REFRESH_TOKEN"))
 
 func GenerateJWT(userID string, roles []string) (string, error) {
 	claims := jwt.MapClaims{
@@ -22,7 +22,7 @@ func GenerateJWT(userID string, roles []string) (string, error) {
 		"iat":   time.Now().Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	return token.SignedString(jwtSecretKey)
 } //
 
 func GenerateRefreshToken(userID string) (string, error) {
@@ -32,7 +32,7 @@ func GenerateRefreshToken(userID string) (string, error) {
 		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(refreshTokenKey)
+	return token.SignedString(refreshTokenSecretKey)
 } //
 
 func ParseJWT(tokenStr string) (string, []string, error) {
@@ -40,7 +40,7 @@ func ParseJWT(tokenStr string) (string, []string, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method")
 		}
-		return jwtKey, nil
+		return jwtSecretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 	if err != nil || !token.Valid {
@@ -66,4 +66,33 @@ func ParseJWT(tokenStr string) (string, []string, error) {
 		}
 	}
 	return sub, roles, nil
-}
+} //
+
+func ParseRefreshToken(tokenStr string) (string, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return refreshTokenSecretKey, nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+
+	if err != nil || !token.Valid {
+		return "", errors.New("invalid or expired refresh token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("invalid token claims")
+	}
+
+	if claims["typ"] != "refresh" {
+		return "", errors.New("token is not a refresh token")
+	}
+
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		return "", errors.New("invalid 'sub' claim")
+	}
+
+	return sub, nil
+} //
