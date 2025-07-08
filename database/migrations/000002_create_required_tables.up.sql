@@ -4,8 +4,6 @@ CREATE TABLE IF NOT EXISTS users(
     username TEXT NOT NULL,
     email TEXT NOT NULL,
     contact_no TEXT,
-    system_role system_role DEFAULT NULL,
-    employee_type employee_type DEFAULT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     archived_at TIMESTAMP
 );
@@ -38,4 +36,23 @@ CREATE TABLE IF NOT EXISTS asset_assign(
 );
 
 
+CREATE TABLE IF NOT EXISTS user_roles(
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    role employee_role,
+    user_id UUID references users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    created_by uuid NOT NUll,
+    last_updated_at TIMESTAMP WITH TIME ZONE,
+    archived_at TIMESTAMP WITH TIME ZONE
+);
 
+
+CREATE TABLE IF NOT EXISTS user_type(
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type employee_type,
+    user_id UUID references users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    created_by uuid NOT NUll,
+    last_updated_at TIMESTAMP WITH TIME ZONE,
+    archived_at TIMESTAMP WITH TIME ZONE
+)

@@ -1,8 +1,9 @@
 --enums
-CREATE TYPE system_role AS ENUM (
+CREATE TYPE employee_role AS ENUM (
     'admin',
     'asset_manager',
     'inventory_manager'
+    'employee'
 );
 
 CREATE TYPE employee_type AS ENUM (
@@ -35,9 +36,5 @@ CREATE TYPE ownership AS ENUM (
     'client'
 );
 
-
-
-
---tables
 
 
