@@ -1,8 +1,18 @@
 package routes
 
-import "github.com/gorilla/mux"
+import (
+	"fmt"
+	"github.com/gorilla/mux"
+	"net/http"
+)
 
 func GetRoutes() *mux.Router {
+	mainRouter := mux.NewRouter()
 
-	return mux.NewRouter()
+	mainRouter.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "connection established...")
+	}).Methods("GET")
+
+	//
+	return mainRouter
 }
