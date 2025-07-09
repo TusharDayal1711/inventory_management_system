@@ -2,7 +2,7 @@
 CREATE TYPE employee_role AS ENUM (
     'admin',
     'asset_manager',
-    'inventory_manager'
+    'inventory_manager',
     'employee'
 );
 
