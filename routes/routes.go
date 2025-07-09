@@ -15,9 +15,10 @@ func GetRoutes() *mux.Router {
 	}).Methods("GET")
 
 	publicRoutes := mainRouter.PathPrefix("/api").Subrouter()
-	
+
 	//public routes
 	publicRoutes.HandleFunc("/user/register", handler.PublicRegister).Methods("POST")
+	publicRoutes.HandleFunc("/user/login", handler.UserLogin).Methods("POST")
 
 	return mainRouter
 }
