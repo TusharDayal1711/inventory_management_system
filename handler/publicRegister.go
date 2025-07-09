@@ -12,7 +12,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-func publicRegister(w http.ResponseWriter, r *http.Request) {
+func PublicRegister(w http.ResponseWriter, r *http.Request) {
 	var userReq models.PublicUserReq
 	if err := utils.ParseJSONBody(r, &userReq); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")

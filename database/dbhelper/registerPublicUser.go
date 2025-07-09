@@ -24,10 +24,10 @@ func IsUserExists(tx *sqlx.Tx, email string) (bool, error) {
 
 func InsertIntoUser(tx *sqlx.Tx, username, email string) (uuid.UUID, error) {
 	var id uuid.UUID
-	err := tx.QueryRow(`
+	err := tx.Get(&id, `
 		INSERT INTO users (username, email) 
 		VALUES ($1, $2) RETURNING id
-	`, username, email).Scan(&id)
+	`, username, email)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("failed to insert user: %w", err)
 	}
@@ -45,11 +45,11 @@ func InsertIntoUserRole(tx *sqlx.Tx, userId uuid.UUID, role string, createdBy uu
 	return nil
 }
 
-func InsertIntoUserType(tx *sqlx.Tx, userId uuid.UUID, empType string, createdBy uuid.UUID) error {
+func InsertIntoUserType(tx *sqlx.Tx, userId uuid.UUID, employeeType string, createdBy uuid.UUID) error {
 	_, err := tx.Exec(`
 		INSERT INTO user_type (type, user_id, created_by)
 		VALUES ($1, $2, $3)
-	`, empType, userId, createdBy)
+	`, employeeType, userId, createdBy)
 	if err != nil {
 		return fmt.Errorf("failed to insert user type: %w", err)
 	}
