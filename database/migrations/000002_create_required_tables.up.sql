@@ -55,4 +55,4 @@ CREATE TABLE IF NOT EXISTS user_type(
     created_by uuid NOT NUll,
     last_updated_at TIMESTAMP WITH TIME ZONE,
     archived_at TIMESTAMP WITH TIME ZONE
-)
+);
