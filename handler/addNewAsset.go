@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database"
@@ -25,6 +26,12 @@ func AddNewAssetWithConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = validator.New().Struct(assetReq)
+	if err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid asset input")
+		return
+	}
+
 	tx, err := database.DB.Beginx()
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to start transaction")
@@ -44,76 +51,75 @@ func AddNewAssetWithConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	assetID, err := dbhelper.AddAsset(tx, assetReq, userUUID)
+	assetId, err := dbhelper.AddAsset(tx, assetReq, userUUID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to insert asset")
 		return
 	}
-
 	switch assetReq.Type {
 	case "laptop":
-		var cfg models.Laptop_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var laptopConfig models.Laptop_config_req
+		if err := json.Unmarshal(assetReq.Config, &laptopConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid laptop config format")
 			return
 		}
-		err = dbhelper.AddLaptopConfig(tx, cfg, assetID)
+		err = dbhelper.AddLaptopConfig(tx, laptopConfig, assetId)
 
 	case "mouse":
-		var cfg models.Mouse_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var mouseConfig models.Mouse_config_req
+		if err := json.Unmarshal(assetReq.Config, &mouseConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid mouse config format")
 			return
 		}
-		err = dbhelper.AddMouseConfig(tx, cfg, assetID)
+		err = dbhelper.AddMouseConfig(tx, mouseConfig, assetId)
 
 	case "monitor":
-		var cfg models.Monitor_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var monitorConfig models.Monitor_config_req
+		if err := json.Unmarshal(assetReq.Config, &monitorConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid monitor config format")
 			return
 		}
-		err = dbhelper.AddMonitorConfig(tx, cfg, assetID)
+		err = dbhelper.AddMonitorConfig(tx, monitorConfig, assetId)
 
 	case "hard_disk":
-		var cfg models.Hard_disk_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var hddConfig models.Hard_disk_config_req
+		if err := json.Unmarshal(assetReq.Config, &hddConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid hard disk config format")
 			return
 		}
-		err = dbhelper.AddHardDiskConfig(tx, cfg, assetID)
+		err = dbhelper.AddHardDiskConfig(tx, hddConfig, assetId)
 
 	case "pen_drive":
-		var cfg models.Pen_drive_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var penConfig models.Pen_drive_config_req
+		if err := json.Unmarshal(assetReq.Config, &penConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid pen drive config format")
 			return
 		}
-		err = dbhelper.AddPenDriveConfig(tx, cfg, assetID)
+		err = dbhelper.AddPenDriveConfig(tx, penConfig, assetId)
 
 	case "mobile":
-		var cfg models.Mobile_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var mobileConfig models.Mobile_config_req
+		if err := json.Unmarshal(assetReq.Config, &mobileConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid mobile config format")
 			return
 		}
-		err = dbhelper.AddMobileConfig(tx, cfg, assetID)
+		err = dbhelper.AddMobileConfig(tx, mobileConfig, assetId)
 
 	case "sim":
-		var cfg models.Sim_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var simConfig models.Sim_config_req
+		if err := json.Unmarshal(assetReq.Config, &simConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid sim config format")
 			return
 		}
-		err = dbhelper.AddSimConfig(tx, cfg, assetID)
+		err = dbhelper.AddSimConfig(tx, simConfig, assetId)
 
 	case "accessory":
-		var cfg models.Accessories_config_req
-		if err := json.Unmarshal(assetReq.Config, &cfg); err != nil {
+		var accessoryConfig models.Accessories_config_req
+		if err := json.Unmarshal(assetReq.Config, &accessoryConfig); err != nil {
 			utils.RespondError(w, http.StatusBadRequest, err, "invalid accessory config format")
 			return
 		}
-		err = dbhelper.AddAccessoryConfig(tx, cfg, assetID)
+		err = dbhelper.AddAccessoryConfig(tx, accessoryConfig, assetId)
 
 	default:
 		utils.RespondError(w, http.StatusBadRequest, nil, "unsupported asset type")
@@ -127,7 +133,7 @@ func AddNewAssetWithConfig(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
-		"message":  "asset and config created successfully",
-		"asset_id": assetID,
+		"msg":   "Asset and configuration created successfully",
+		"Asset": assetReq,
 	})
 }

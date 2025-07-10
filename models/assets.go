@@ -1,17 +1,19 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type AssetReq struct {
-	ID             string    `json:"id"`
-	Brand          string    `json:"brand"`
-	Model          string    `json:"model"`
-	SerialNo       string    `json:"serial_no"`
-	PurchaseDate   time.Time `json:"purchase_date"`
-	OwnedBy        string    `json:"owned_by"`
-	Type           string    `json:"type"`
-	WarrantyStart  time.Time `json:"warranty"`
-	WarrantyExpire time.Time `json:"warranty_expire"`
+	Brand          string    `json:"brand" validate:"required"`
+	Model          string    `json:"model" validate:"required"`
+	SerialNo       string    `json:"serial_no" validate:"required"`
+	PurchaseDate   time.Time `json:"purchase_date" validate:"required"`
+	OwnedBy        string    `json:"owned_by" validate:"required"`
+	Type           string    `json:"type" validate:"required"`
+	WarrantyStart  time.Time `json:"warranty" validate:"required"`
+	WarrantyExpire time.Time `json:"warranty_expire" validate:"required,gtfield=WarrantyStart"`
 }
 
 // Assets request model
@@ -65,32 +67,7 @@ type Accessories_config_req struct {
 	AdditionalInfo string `json:"additional_info"`
 }
 
-type AssetConfigReq struct {
-	ID             string `json:"id"`
-	Processor      string `json:"processor,omitempty"`
-	Ram            string `json:"ram,omitempty"`
-	Os             string `json:"os,omitempty"`
-	DPI            string `json:"dpi,omitempty"`
-	Display        string `json:"display,omitempty"`
-	Resolution     string `json:"resolution,omitempty"`
-	Port           string `json:"port,omitempty"`
-	HDDType        string `json:"hdd_type,omitempty"`
-	Storage        string `json:"storage,omitempty"`
-	Version        string `json:"version,omitempty"`
-	IMEI1          string `json:"imei1,omitempty"`
-	IMEI2          string `json:"imei2,omitempty"`
-	Number         int    `json:"number,omitempty"`
-	AccessoryType  string `json:"accessory_type,omitempty"`
-	AdditionalInfo string `json:"additional_info,omitempty"`
-}
-
-var TypeTableName = map[string]string{
-	"laptop":     "laptop_config_Req",
-	"mouse":      "mouse_config_Req",
-	"monitor":    "monitor_config_Req",
-	"hard_disk":  "hard_disk_config_Req",
-	"pen_driver": "pen_driver_config_Req",
-	"mobile":     "mobile_config_Req",
-	"sim":        "sim_config_Req",
-	"accessory":  "accessory_config_Req",
+type AddAssetWithConfigReq struct {
+	AssetReq
+	Config json.RawMessage `json:"config"`
 }
