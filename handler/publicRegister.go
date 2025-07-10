@@ -19,7 +19,6 @@ func PublicRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate email
 	if userReq.Email == "" {
 		utils.RespondError(w, http.StatusBadRequest, nil, "email is required")
 		return
