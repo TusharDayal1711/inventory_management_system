@@ -14,6 +14,7 @@ func main() {
 	config.LoadEnv()
 	dbConnectionString := config.GetDatabaseString()
 	database.Init(dbConnectionString)
+	//handler.CreateFirstAdmin()
 	defer database.DB.Close()
 
 	r := routes.GetRoutes()
