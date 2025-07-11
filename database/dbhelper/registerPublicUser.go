@@ -24,12 +24,20 @@ func IsUserExists(tx *sqlx.Tx, email string) (bool, error) {
 
 func InsertIntoUser(tx *sqlx.Tx, username, email string) (uuid.UUID, error) {
 	var id uuid.UUID
+
 	err := tx.Get(&id, `
-		INSERT INTO users (username, email) 
-		VALUES ($1, $2) RETURNING id
+		INSERT INTO users (username, email)
+		VALUES ($1, $2)
+		RETURNING id
 	`, username, email)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("failed to insert user: %w", err)
+	}
+	_, err = tx.Exec(`
+		UPDATE users SET created_by = $1 WHERE id = $1
+	`, id)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("failed to update created_by: %w", err)
 	}
 	return id, nil
 }
