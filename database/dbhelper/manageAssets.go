@@ -28,7 +28,7 @@ func AssignAssetByID(tx *sqlx.Tx, assetId uuid.UUID, userId uuid.UUID, assignedB
 		VALUES ($1, $2, $3)
 	`, assetId, userId, assignedBy)
 	if err != nil {
-		return fmt.Errorf("failed to insert into asset_assign table :%w", err)
+		return fmt.Errorf("failed to insert into asset_assign table%w", err)
 	}
 	//updating asset status in asset table
 	_, err = tx.Exec(`
