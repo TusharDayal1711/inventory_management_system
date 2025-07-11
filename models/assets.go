@@ -18,37 +18,37 @@ type AssetReq struct {
 
 // Assets request model
 type Laptop_config_req struct {
-	SerialNo  string `json:"serial_no"`
+	SerialNo  string `json:"serial_no" validate:"required"`
 	Processor string `json:"processor"`
 	Ram       string `json:"ram"`
 	Os        string `json:"os"`
 }
 type Mouse_config_req struct {
-	SerialNo string `json:"serial_no"`
+	SerialNo string `json:"serial_no" validate:"required"`
 	DPI      string `json:"dpi"`
 }
 
 type Monitor_config_req struct {
-	SerialNo   string `json:"serial_no"`
+	SerialNo   string `json:"serial_no" validate:"required"`
 	Display    string `json:"display"`
 	Resolution string `json:"resolution"`
 	Port       string `json:"port"`
 }
 
 type Hard_disk_config_req struct {
-	SerialNo string `json:"serial_no"`
+	SerialNo string `json:"serial_no" validate:"required"`
 	Type     string `json:"type"`
 	Storage  string `json:"storage"`
 }
 
 type Pen_drive_config_req struct {
-	SerialNo string `json:"serial_no"`
+	SerialNo string `json:"serial_no" validate:"required"`
 	Version  string `json:"version"`
 	Storage  string `json:"storage"`
 }
 
 type Mobile_config_req struct {
-	SerialNo  string `json:"serial_no"`
+	SerialNo  string `json:"serial_no" validate:"required"`
 	Processor string `json:"processor"`
 	Ram       string `json:"ram"`
 	Os        string `json:"os"`
@@ -57,17 +57,22 @@ type Mobile_config_req struct {
 }
 
 type Sim_config_req struct {
-	SerialNo string `json:"serial_no"`
+	SerialNo string `json:"serial_no" validate:"required"`
 	Number   int    `json:"number"`
 }
 
 type Accessories_config_req struct {
-	SerialNo       string `json:"serial_no"`
+	SerialNo       string `json:"serial_no" validate:"required"`
 	Type           string `json:"type"`
 	AdditionalInfo string `json:"additional_info"`
 }
 
 type AddAssetWithConfigReq struct {
 	AssetReq
-	Config json.RawMessage `json:"config"`
+	Config json.RawMessage `json:"config" `
+}
+
+type AssetAssignReq struct {
+	UserID  string `json:"user_id"`
+	AssetID string `json:"asset_id"`
 }
