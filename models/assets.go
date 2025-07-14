@@ -76,3 +76,18 @@ type AssetAssignReq struct {
 	UserID  string `json:"user_id"`
 	AssetID string `json:"asset_id"`
 }
+
+type AssetRes struct {
+	ID       string `json:"id" db:"id"`
+	Brand    string `json:"brand" db:"brand"`
+	Model    string `json:"model" db:"model"`
+	SerialNo string `json:"serial_no" db:"serial_no"`
+	Type     string `json:"type" db:"type"`
+	OwnedBy  string `json:"owned_by" db:"owned_by"`
+	Status   string `json:"status" db:"status"`
+}
+
+type AssetReturnReq struct {
+	AssetID      string `json:"asset_id" validate:"required,uuid"`
+	ReturnReason string `json:"return_reason" validate:"required"`
+}
