@@ -89,5 +89,6 @@ type AssetRes struct {
 
 type AssetReturnReq struct {
 	AssetID      string `json:"asset_id" validate:"required,uuid"`
-	ReturnReason string `json:"return_reason" validate:"required"`
+	EmployeeID   string `json:"employee_id" validate:"required,uuid"`
+	ReturnReason string `json:"return_reason"`
 }
