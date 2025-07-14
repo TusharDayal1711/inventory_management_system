@@ -8,7 +8,7 @@ import (
 )
 
 func GetUserAssetTimeline(userID uuid.UUID) ([]models.UserTimelineRes, error) {
-	timeline := []models.UserTimelineRes{}
+	timeline := make([]models.UserTimelineRes, 0)
 	err := database.DB.Select(&timeline, `
 		SELECT 
 			a.asset_id,
