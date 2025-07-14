@@ -24,7 +24,7 @@ func GetUserAssetTimeline(userID uuid.UUID) ([]models.UserTimelineRes, error) {
 		ORDER BY a.assigned_at DESC
 	`, userID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get asset timeline")
+		return nil, fmt.Errorf("failed to get user timeline")
 	}
 	return timeline, nil
 }
