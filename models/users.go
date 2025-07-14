@@ -15,3 +15,12 @@ type ManagerRegisterReq struct {
 	ContactNo string `json:"contact_no" validate:"required"`
 	Type      string `json:"type" validate:"required,oneof=full_time intern freelancer"`
 }
+
+type EmployeeAssetRes struct {
+	ID            string   `json:"id"`
+	Username      string   `json:"name"`
+	Email         string   `json:"email"`
+	ContactNo     string   `json:"contact_no"`
+	Type          string   `json:"type"`
+	AssetAssigned []string `json:"asset_assigned"`
+}
