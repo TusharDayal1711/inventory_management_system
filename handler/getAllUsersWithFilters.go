@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"inventory_management_system/database/dbhelper"
+	"inventory_management_system/middlewares"
 	"inventory_management_system/models"
 	"inventory_management_system/utils"
 	"net/http"
@@ -10,6 +11,16 @@ import (
 )
 
 func GetEmployeesWithFilters(w http.ResponseWriter, r *http.Request) {
+	_, roles, err := middlewares.GetUserAndRolesFromContext(r)
+	if err != nil {
+		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
+		return
+	}
+	role := roles[0]
+	if role != "admin" && role != "employee_manager" {
+		utils.RespondError(w, http.StatusForbidden, nil, "only admin and asset manager can assign assets")
+		return
+	}
 	var filter models.EmployeeFilter
 	filter.SearchText = r.URL.Query().Get("search")
 	filter.IsSearchText = filter.SearchText != ""
@@ -34,6 +45,7 @@ func GetEmployeesWithFilters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"employees": employees,
 	})
