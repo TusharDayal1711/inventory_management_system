@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	_, roles, err := middlewares.GetUserAndRolesFromContext(r)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
