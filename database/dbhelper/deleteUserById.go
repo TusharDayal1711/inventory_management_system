@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"inventory_management_system/database"
-	"time"
 )
 
 func DeleteUserByID(userID uuid.UUID) error {
@@ -12,39 +11,46 @@ func DeleteUserByID(userID uuid.UUID) error {
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
-
 	defer func() {
-		if p := recover(); p != nil || err != nil {
+		if p := recover(); p != nil {
+			tx.Rollback()
+		} else if err != nil {
 			tx.Rollback()
 		} else {
-			tx.Commit()
+			err = tx.Commit()
 		}
 	}()
 
-	now := time.Now()
-
-	_, err = tx.Exec(`
-		UPDATE users SET archived_at = $1
-		WHERE id = $2 AND archived_at IS NULL
-	`, now, userID)
+	var count int
+	err = tx.Get(&count, `
+		SELECT COUNT(*) FROM asset_assign
+		WHERE employee_id = $1 AND returned_at IS NULL AND archived_at IS NULL
+	`, userID)
 	if err != nil {
-		return fmt.Errorf("failed to soft delete user: %w", err)
+		return fmt.Errorf("failed to check active asset assignment: %w", err)
+	}
+	if count > 0 {
+		return fmt.Errorf("cannot delete user, still have asset assigned")
+	}
+	_, err = tx.Exec(`
+		UPDATE users SET archived_at = now() WHERE id = $1 AND archived_at IS NULL
+	`, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
 	}
 
 	_, err = tx.Exec(`
-		UPDATE user_roles SET archived_at = $1
-		WHERE user_id = $2 AND archived_at IS NULL
-	`, now, userID)
+		UPDATE user_roles SET archived_at = now() WHERE user_id = $1 AND archived_at IS NULL
+	`, userID)
 	if err != nil {
-		return fmt.Errorf("failed to soft delete user roles: %w", err)
+		return fmt.Errorf("failed to delete user roles: %w", err)
 	}
 
 	_, err = tx.Exec(`
-		UPDATE user_type SET archived_at = $1
-		WHERE user_id = $2 AND archived_at IS NULL
-	`, now, userID)
+		UPDATE user_type SET archived_at = now() WHERE user_id = $1 AND archived_at IS NULL
+	`, userID)
 	if err != nil {
-		return fmt.Errorf("failed to soft delete user type: %w", err)
+		return fmt.Errorf("failed to delete user type: %w", err)
 	}
 
 	return nil

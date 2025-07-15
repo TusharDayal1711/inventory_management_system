@@ -2,12 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
-	"inventory_management_system/models"
 	"inventory_management_system/utils"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,31 +18,30 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	role := roles[0]
-	if role != "admin" && role != "employee_manager" {
+	if role != "admin" && role != "asset_manager" {
 		utils.RespondError(w, http.StatusForbidden, nil, "only admin and asset manager can delete users")
 		return
 	}
 
-	var req models.DeleteUserReq
-	if err := utils.ParseJSONBody(r, &req); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, err, "invalid request body")
+	userID := r.URL.Query().Get("user_id")
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid user id...")
 		return
 	}
 
-	userID, err := uuid.Parse(req.UserID)
+	err = dbhelper.DeleteUserByID(userUUID)
 	if err != nil {
-		utils.RespondError(w, http.StatusBadRequest, err, "invalid user ID format")
-		return
-	}
-
-	err = dbhelper.DeleteUserByID(userID)
-	if err != nil {
+		if err.Error() == "cannot delete user, still have asset assigned" {
+			utils.RespondError(w, http.StatusConflict, err, "cannot delete user, still have asset assigned")
+			return
+		}
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to soft delete user")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "user deleted successfully",
+		"message": "user soft deleted successfully",
 	})
 }
