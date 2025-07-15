@@ -18,7 +18,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	role := roles[0]
-	if role != "admin" && role != "asset_manager" {
+	if role != "admin" && role != "employee_manager" {
 		utils.RespondError(w, http.StatusForbidden, nil, "only admin and asset manager can delete users")
 		return
 	}
