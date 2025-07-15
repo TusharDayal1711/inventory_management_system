@@ -11,15 +11,18 @@ func AssignAssetByID(tx *sqlx.Tx, assetId uuid.UUID, userId uuid.UUID, assignedB
 
 	var exists int
 	err := tx.Get(&exists, `
-		SELECT 1 FROM asset_assign 
-		WHERE asset_id = $1 AND archived_at IS NULL 
-		LIMIT 1
-	`, assetId)
-	if err == nil {
+	SELECT 1 FROM asset_assign 
+	WHERE asset_id = $1 AND returned_at IS NULL AND archived_at IS NULL
+	LIMIT 1
+`, assetId)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+		} else {
+			return fmt.Errorf("failed to check existing assignment: %w", err)
+		}
+	} else {
 		return fmt.Errorf("asset already assigned")
-	}
-	if err != sql.ErrNoRows {
-		return fmt.Errorf("failed to check existing assignment: %w", err)
 	}
 
 	//inserting into asset_assign table
