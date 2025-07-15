@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func ReturnAsset(tx *sqlx.Tx, assetID, employeeID uuid.UUID, reason string) error {
+func RetrieveAsset(tx *sqlx.Tx, assetID, employeeID uuid.UUID, reason string) error {
 	_, err := tx.Exec(`
 		UPDATE asset_assign 
 		SET returned_at = now(), return_reason = $1

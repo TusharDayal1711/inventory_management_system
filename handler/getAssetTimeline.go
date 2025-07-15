@@ -15,19 +15,21 @@ func GetAssetTimeline(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
 		return
 	}
-	assetId := r.URL.Query().Get("asset_id")
-	assetUUID, err := uuid.Parse(assetId)
+	assetIDStr := r.URL.Query().Get("asset_id")
+	assetID, err := uuid.Parse(assetIDStr)
 	if err != nil {
-		utils.RespondError(w, http.StatusBadRequest, err, "invalid asset_id")
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid asset id")
 		return
 	}
-	timeline, err := dbhelper.GetAssetTimeline(assetUUID)
+
+	timeline, err := dbhelper.GetAssetTimeline(assetID)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch asset timeline")
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+
 	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
+		"asset_id": assetID,
 		"timeline": timeline,
 	})
 
