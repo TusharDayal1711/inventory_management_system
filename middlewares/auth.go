@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"inventory_management_system/database"
+	"inventory_management_system/models"
 	"inventory_management_system/utils"
 	"net/http"
 	"strings"
@@ -70,7 +71,12 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func RequireRole(requiredRoles ...string) func(http.Handler) http.Handler {
+func RequireRole(allowedRoles ...models.Role) func(http.Handler) http.Handler {
+	allowed := make(map[models.Role]bool)
+	for _, role := range allowedRoles {
+		allowed[role] = true
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, roles, err := GetUserAndRolesFromContext(r)
@@ -78,15 +84,14 @@ func RequireRole(requiredRoles ...string) func(http.Handler) http.Handler {
 				http.Error(w, "unauthorized", http.StatusUnauthorized)
 				return
 			}
+
 			for _, role := range roles {
-				for _, requiredRole := range requiredRoles {
-					if role == requiredRole {
-						next.ServeHTTP(w, r)
-						return
-					}
+				if allowed[models.Role(role)] {
+					next.ServeHTTP(w, r)
+					return
 				}
 			}
-			http.Error(w, "unauthorized user", http.StatusForbidden)
+			http.Error(w, "forbidden", http.StatusForbidden)
 		})
 	}
 }
