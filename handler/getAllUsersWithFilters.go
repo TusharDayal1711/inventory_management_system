@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
 	"inventory_management_system/models"
@@ -46,7 +46,7 @@ func GetEmployeesWithFilters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"employees": employees,
 	})
 }

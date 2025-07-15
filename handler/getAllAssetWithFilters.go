@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
+	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
 	"inventory_management_system/models"
@@ -48,7 +48,7 @@ func GetAllAssetsWithFilters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 
 		"assets": assets,
 	})

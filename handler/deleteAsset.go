@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
 	"inventory_management_system/utils"
@@ -40,7 +40,7 @@ func DeleteAsset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
+	jsoniter.NewEncoder(w).Encode(map[string]string{
 		"message": "asset deleted successfully",
 	})
 }

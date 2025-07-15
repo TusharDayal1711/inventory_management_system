@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func ReturnAsset(w http.ResponseWriter, r *http.Request) {
+func RetrieveAsset(w http.ResponseWriter, r *http.Request) {
 	_, roles, err := middlewares.GetUserAndRolesFromContext(r)
 	if err != nil {
 		utils.RespondError(w, http.StatusUnauthorized, err, "unauthorized")
@@ -55,14 +55,14 @@ func ReturnAsset(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	err = dbhelper.ReturnAsset(tx, assetUUID, employeeUUID, req.ReturnReason)
+	err = dbhelper.RetrieveAsset(tx, assetUUID, employeeUUID, req.ReturnReason)
 	if err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, err, "failed to return asset")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
+	jsoniter.NewEncoder(w).Encode(map[string]string{
 		"message": "asset returned successfully",
 	})
 }

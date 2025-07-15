@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
@@ -76,7 +76,7 @@ func AssignAssetToUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	jsoniter.NewEncoder(w).Encode(map[string]interface{}{
 		"message":     "asset assigned successfully",
 		"user_id":     userUUID,
 		"asset_id":    assetUUID,

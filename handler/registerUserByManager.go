@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database"
@@ -27,6 +28,11 @@ func RegisterEmployeeByManager(w http.ResponseWriter, r *http.Request) {
 	var employeeReq models.ManagerRegisterReq
 	if err := utils.ParseJSONBody(r, &employeeReq); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input body")
+		return
+	}
+
+	if err := validator.New().Struct(employeeReq); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid role input")
 		return
 	}
 

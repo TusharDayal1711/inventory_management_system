@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	"inventory_management_system/database/dbhelper"
@@ -18,8 +19,9 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid input")
 		return
 	}
-	if userInfo.Email == "" {
-		utils.RespondError(w, http.StatusBadRequest, nil, "valid email id required")
+	err := validator.New().Struct(userInfo)
+	if err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid asset input, email required")
 		return
 	}
 	userID, err := dbhelper.GetUserByEmail(userInfo.Email)
