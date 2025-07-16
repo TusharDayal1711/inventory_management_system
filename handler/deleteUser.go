@@ -1,13 +1,12 @@
 package handler
 
 import (
+	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/middlewares"
 	"inventory_management_system/utils"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -17,8 +16,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role := roles[0]
-	if role != "admin" && role != "asset_manager" {
+	managerRole := roles[0]
+	if managerRole != "admin" && managerRole != "asset_manager" {
 		utils.RespondError(w, http.StatusForbidden, nil, "only admin and asset manager can delete users")
 		return
 	}
@@ -30,18 +29,29 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userRole, err := dbhelper.GetUserRoleById(userUUID)
+	if err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, err, "failed to fetch user role")
+		return
+	}
+
+	if managerRole != "admin" && (userRole == "admin" || userRole == "asset_manager" || userRole == "inventory_manager") {
+		utils.RespondError(w, http.StatusForbidden, nil, "only admin can delete admin or manager roles")
+		return
+	}
+
 	err = dbhelper.DeleteUserByID(userUUID)
 	if err != nil {
 		if err.Error() == "cannot delete user, still have asset assigned" {
 			utils.RespondError(w, http.StatusConflict, err, "cannot delete user, still have asset assigned")
 			return
 		}
-		utils.RespondError(w, http.StatusInternalServerError, err, "failed to soft delete user")
+		utils.RespondError(w, http.StatusInternalServerError, err, "failed to delete user")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]string{
-		"message": "user soft deleted successfully",
+		"message": "user deleted successfully",
 	})
 }
