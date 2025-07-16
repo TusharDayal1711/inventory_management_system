@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/go-playground/validator/v10"
 	"inventory_management_system/database"
 	"inventory_management_system/database/dbhelper"
 	"inventory_management_system/models"
@@ -19,8 +20,10 @@ func PublicRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if userReq.Email == "" {
-		utils.RespondError(w, http.StatusBadRequest, nil, "email is required")
+	//validate using playground validator
+	err := validator.New().Struct(userReq)
+	if err != nil {
+		utils.RespondError(w, http.StatusBadRequest, err, "invalid asset input")
 		return
 	}
 	splitEmail := strings.Split(userReq.Email, "@")
