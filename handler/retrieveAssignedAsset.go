@@ -9,6 +9,7 @@ import (
 	"inventory_management_system/models"
 	"inventory_management_system/utils"
 	"net/http"
+	"strings"
 )
 
 func RetrieveAsset(w http.ResponseWriter, r *http.Request) {
@@ -57,12 +58,16 @@ func RetrieveAsset(w http.ResponseWriter, r *http.Request) {
 
 	err = dbhelper.RetrieveAsset(tx, assetUUID, employeeUUID, req.ReturnReason)
 	if err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, err, "failed to return asset")
+		if strings.Contains(err.Error(), "no matching asset assignment found") {
+			utils.RespondError(w, http.StatusNotFound, nil, " no such asset exist or already returned")
+			return
+		}
+		utils.RespondError(w, http.StatusInternalServerError, err, "no matching asset assignment found")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	jsoniter.NewEncoder(w).Encode(map[string]string{
-		"message": "asset returned successfully",
+		"message": "asset returned successfully...",
 	})
 }
