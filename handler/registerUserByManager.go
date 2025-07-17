@@ -11,6 +11,7 @@ import (
 	"inventory_management_system/models"
 	"inventory_management_system/utils"
 	"net/http"
+	"strings"
 )
 
 func RegisterEmployeeByManager(w http.ResponseWriter, r *http.Request) {
@@ -33,6 +34,11 @@ func RegisterEmployeeByManager(w http.ResponseWriter, r *http.Request) {
 
 	if err := validator.New().Struct(employeeReq); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, err, "invalid role input")
+		return
+	}
+	splitEmail := strings.Split(employeeReq.Email, "@")
+	if len(splitEmail) != 2 || splitEmail[1] != "remotestate.com" {
+		utils.RespondError(w, http.StatusBadRequest, nil, "only remotestate.com domain is valid")
 		return
 	}
 
